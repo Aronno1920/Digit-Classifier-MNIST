@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Draw a Digit</title>
+  
+  <style>
+    canvas {
+      border: 1px solid black;
+      background-color: white;
+      cursor: crosshair;
+    }
+  </style>
+</head>
+<body>
+  <h2>Draw a digit (0–9)</h2>
+  <canvas id="canvas" width="280" height="280"></canvas><br>
+
+  <button onclick="submitCanvas()">Predict</button>
+  <button onclick="clearCanvas()">Clear</button>
+
+  <h3 id="prediction-result"></h3>
+  <form id="digit-form" method="POST" enctype="multipart/form-data" style="display:none;">
+    <input type="hidden" name="digit" id="digit-image">
+  </form>
+
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
