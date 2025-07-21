@@ -1,33 +1,47 @@
+######## Import Library
 import io
 import numpy as np
 import base64
 
+import tensorflow as tf
+import re
 from PIL import Image
-from tensorflow.keras.models import load_model
 from flask import Flask, render_template, request, jsonify
+######## Import Library
 
+######## Start Application
 app = Flask(__name__)
-model = load_model('model/mnist_model.keras')
 
-def preprocess_image(image_bytes):
-    image = Image.open(io.BytesIO(image_bytes)).convert('L')
-    image = image.resize((28, 28))
-    image = np.array(image) / 255.0
-    image = image.reshape(1, 28 * 28)
-    return image
+######## Load Model
+model =  tf.keras.models.load_model('model/mnist_model.keras')
 
-@app.route('/', methods=['GET', 'POST'])
+######## Load Root - Index page
+@app.route("/")
 def index():
-    if request.method == 'POST':
-        data = request.get_json()
-        image_data = data['image'].split(',')[1]  # Remove header
-        image_bytes = base64.b64decode(image_data)
-        input_data = preprocess_image(image_bytes)
-        pred = model.predict(input_data, verbose=0)
-        prediction = int(np.argmax(pred))
-        return jsonify({'prediction': prediction})
+    return render_template("index.html")
 
-    return render_template('index.html')
+######## Load Root - Index page
+@app.route("/predict", methods=["POST"])
+def predict():
+    data_url = request.json["image"]
+    image_data = re.sub('^data:image/.+;base64,', '', data_url)
+    image = Image.open(io.BytesIO(base64.b64decode(image_data))).convert("L")
+    image = image.resize((28, 28))
+    image_array = np.array(image)
+    image_array = (255 - image_array) / 255.0  # Invert + normalize
 
-if __name__ == '__main__':
+    # Convert from (28, 28) to (1, 28, 28)
+    image_array = np.expand_dims(image_array, axis=0)
+    image_array = np.expand_dims(image_array, axis=0)
+
+    # Now shape is (1, 1, 28, 28), matching model input (None, 1, 28, 28)
+    prediction = model.predict(image_array)
+    probs = prediction[0].tolist()
+    digit = int(np.argmax(probs))
+
+    return jsonify({"digit": digit, "probs": probs})
+
+
+
+if __name__ == "__main__":
     app.run(debug=True)
