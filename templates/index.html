@@ -1,31 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Draw a Digit</title>
-  
-  <style>
-    canvas {
-      border: 1px solid black;
-      background-color: white;
-      cursor: crosshair;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Digit Recognizer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <h2>Draw a digit (0–9)</h2>
-  <canvas id="canvas" width="280" height="280"></canvas><br>
+  <h1>Real-Time Digit Recognizer</h1>
 
-  <button onclick="submitCanvas()">Predict</button>
-  <button onclick="clearCanvas()">Clear</button>
+  <div class="container">
+      <canvas id="canvas" width="280" height="280"></canvas>
+      <div class="buttons">
+          <button onclick="predict()">Predict</button>
+          <button onclick="clearCanvas()">Clear</button>
+      </div>
+      <div id="result">Draw a digit</div>
+      <div id="probs" class="bar-container"></div>
+  </div>
 
-  <h3 id="prediction-result"></h3>
-  <form id="digit-form" method="POST" enctype="multipart/form-data" style="display:none;">
-    <input type="hidden" name="digit" id="digit-image">
-  </form>
+  <!-- <script src="{{ url_for('static', filename='script.js') }}"></script> -->
 
+<script>
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
 
-  <script src="{{ url_for('static', filename='script.js') }}"></script>
+    // Setup canvas
+    function setupCanvas() {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 20;
+        ctx.lineCap = "round";
+    }
+
+    setupCanvas();
+
+    let drawing = false;
+
+    canvas.addEventListener("mousedown", (e) => {
+        drawing = true;
+        const pos = getMousePos(e);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+        if (!drawing) return;
+        const pos = getMousePos(e);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+    });
+
+    canvas.addEventListener("mouseup", () => {
+        drawing = false;
+        ctx.closePath();
+    });
+
+    canvas.addEventListener("mouseleave", () => {
+        drawing = false;
+        ctx.closePath();
+    });
+
+    function getMousePos(evt) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+        };
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        setupCanvas();
+        document.getElementById("result").innerText = "Draw a digit";
+        document.getElementById("probs").innerHTML = "";
+    }
+
+    function predict() {
+        const image = canvas.toDataURL("image/png");
+        fetch("/predict", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ image: image })
+        })
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById("result").innerText = `Prediction: ${data.digit}`;
+            showProbs(data.probs);
+        });
+    }
+
+    function showProbs(probs) {
+        const container = document.getElementById("probs");
+        container.innerHTML = "";
+        probs.forEach((p, i) => {
+            const label = document.createElement("div");
+            label.className = "bar-label";
+            label.innerHTML = `<span>${i}</span><span>${(p * 100).toFixed(2)}%</span>`;
+
+            const bar = document.createElement("div");
+            bar.className = "bar";
+            bar.style.width = `${(p * 100).toFixed(2)}%`;
+
+            container.appendChild(label);
+            container.appendChild(bar);
+        });
+    }
+</script>
+
 
 </body>
 </html>
