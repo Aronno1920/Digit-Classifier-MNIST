@@ -8,11 +8,15 @@
 <body>
     <h1>Train a New Model</h1>
     <form action="/train" method="post">
-        <button type="submit">Start Training</button>
+        <div class="buttons">
+            <button type="submit" style="background: #4CAF50;">Start Training</button>
+            <a href="/" class="back-button">Back to Home</a>
+        </div>
     </form>
 
     {% if logs %}
         <pre>{{ logs }}</pre>
     {% endif %}
+
 </body>
 </html>

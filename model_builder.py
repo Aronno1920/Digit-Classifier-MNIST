@@ -1,8 +1,5 @@
 ###### Import Required Libraries
 import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.utils import to_categorical
@@ -90,6 +87,11 @@ def train_model():
     )
     #################
 
+
+    ###### Best Epoch - Use EarlyStopping
+    best_epoch = np.argmin(history.history['val_loss']) + 1
+    print(f"Best Epoch -> ", best_epoch)
+    #################
 
 ################## Return value
     return history.history

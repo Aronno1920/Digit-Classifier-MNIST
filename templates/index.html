@@ -6,14 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
 </head>
 <body>
   <h1>Digit Classifier</h1>
-  <a href="/train">Go to Train Model Page</a>
-  
+  <a href="/train">Go to Train Model</a>
+
   <div class="container">
       <h3>Draw a digit (0–9)</h3>
       <canvas id="canvas" width="280" height="280"></canvas>
+
       <div class="buttons">
           <button onclick="predict()" style="background: #4CAF50;">Predict</button>
           <button onclick="clearCanvas()" style="background: #606263;">Clear</button>
@@ -23,6 +25,5 @@
   </div>
 
 <script src="{{ url_for('static', filename='script.js') }}"></script>
-
 </body>
 </html>
