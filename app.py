@@ -34,7 +34,6 @@ def predict():
     image_array = np.expand_dims(image_array, axis=0)   # shape: (1, 28, 28)
     image_array = image_array.reshape(1, 784)  
 
-    print("-----------------Image shape----------------:", image_array.shape)
 
     # Now shape is (1, 1, 28, 28), matching model input (None, 1, 28, 28)
     prediction = model.predict(image_array)
@@ -42,6 +41,26 @@ def predict():
     digit = int(np.argmax(probs))
 
     return jsonify({"digit": digit, "probs": probs})
+
+
+
+@app.route("/train", methods=["GET", "POST"])
+def train():
+    logs = ""
+    if request.method == "POST":
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            history = model_builder()
+            print("Training completed!")
+            print("Final accuracy:", history['accuracy'][-1])
+
+        logs = buffer.getvalue()
+
+    return render_template("train.html", logs=logs)
+
+
+
+
 
 
 
