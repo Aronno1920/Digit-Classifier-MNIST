@@ -1,16 +1,10 @@
 # 🧠 Digit Classifier – MNIST (Flask + TensorFlow)
 
-This project is a **handwritten digit recognizer** powered by a trained **TensorFlow** model on the **MNIST dataset**. It features a modern HTML5 canvas frontend and a **Flask backend** to serve predictions from a `.h5` model.
+This project is a **handwritten digit recognizer** powered by a trained **TensorFlow** model on the **MNIST dataset**. It features a modern HTML5 canvas frontend and a **Flask backend** to serve predictions from a `.keras` model.
 
-![Screenshot](https://github.com/mahisalman/Digit-Classifier-MNIST/blob/main/Digit-Classifier-MNIST.png)
-
----
-
-## 🚀 Live Demo
-
-🖼️ Coming soon or deploy locally (see below).
 
 ---
+
 
 ## 📦 Project Structure
 mnist-digit-classifier/
