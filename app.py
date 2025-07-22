@@ -1,5 +1,6 @@
 ######## Import Library
 import io
+import os
 import numpy as np
 import base64
 
@@ -7,20 +8,29 @@ import tensorflow as tf
 import re
 from PIL import Image
 from flask import Flask, render_template, request, jsonify
-######## Import Library
+from contextlib import redirect_stdout
+#################
+from model_builder import train_model
+
 
 ######## Start Application
 app = Flask(__name__)
 
-######## Load Model
-model =  tf.keras.models.load_model('model/mnist_model.keras')
+if os.path.exists("model/mnist_model.keras"):
+    model =  tf.keras.models.load_model("model/mnist_model.keras")
+#################
+
+
 
 ######## Load Root - Index page
 @app.route("/")
 def index():
     return render_template("index.html")
+#################
 
-######## Load Root - Index page
+
+
+######## Call Predict Function
 @app.route("/predict", methods=["POST"])
 def predict():
     data_url = request.json["image"]
@@ -34,33 +44,34 @@ def predict():
     image_array = np.expand_dims(image_array, axis=0)   # shape: (1, 28, 28)
     image_array = image_array.reshape(1, 784)  
 
+    if os.path.exists("model/mnist_model.keras"):
+        model =  tf.keras.models.load_model("model/mnist_model.keras")
 
-    # Now shape is (1, 1, 28, 28), matching model input (None, 1, 28, 28)
-    prediction = model.predict(image_array)
-    probs = prediction[0].tolist()
-    digit = int(np.argmax(probs))
+        prediction = model.predict(image_array)
+        probs = prediction[0].tolist()
+        digit = int(np.argmax(probs))
 
     return jsonify({"digit": digit, "probs": probs})
+#################
 
 
 
+######## Call Model Training Function
 @app.route("/train", methods=["GET", "POST"])
 def train():
     logs = ""
     if request.method == "POST":
         buffer = io.StringIO()
         with redirect_stdout(buffer):
-            history = model_builder()
+            history = train_model()
+
             print("Training completed!")
             print("Final accuracy:", history['accuracy'][-1])
 
         logs = buffer.getvalue()
 
     return render_template("train.html", logs=logs)
-
-
-
-
+#################
 
 
 
