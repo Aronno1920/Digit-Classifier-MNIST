@@ -13,18 +13,23 @@ This project is a **handwritten digit recognizer** powered by a trained **Tensor
 ---
 
 ## 📦 Project Structure
-
-Digit-Classifier-MNIST/
-
-├── app.py # Flask app
-
-├── mnist_digit_classifier.h5 # Trained model (28x28 MNIST digits)
-
-├── requirements.txt # Python dependencies
-
-└── templates/
-
-└── index.html # HTML5 + JS frontend
+mnist-digit-classifier/
+├── app/
+│ ├── static/
+│ │ ├── script.js
+│ │ └── style.css
+│ ├── templates/
+│ │ ├── index.html
+│ │ └── train.html
+├── model/
+│ └── mnist_model.h5
+├── notebooks/
+│ └── training.ipynb
+├── screenshots/
+│ └── demo.gif / accuracy_plot.png
+├── README.md
+├── app.py
+└── requirements.txt
 
 
 ---
