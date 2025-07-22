@@ -8,7 +8,6 @@
 
 A deep learning web app that classifies handwritten digits (0–9) using the **MNIST dataset**. Built with **TensorFlow/Keras** and deployed via a lightweight Flask frontend with a live canvas to draw digits.
 
----
 
 
 ## 📌 Features
@@ -19,7 +18,7 @@ A deep learning web app that classifies handwritten digits (0–9) using the **M
 - 🔮 Real-Time Prediction using Trained Model  
 - 🧪 98–99% Test Accuracy  
 
----
+
 
 ## 📂 Project Structure
 
@@ -41,7 +40,8 @@ digitclassifier/
 └── requirements.txt
 ```
 
----
+
+
 
 ## ⚙️ Installation
 
@@ -73,7 +73,7 @@ cd app
 python app.py
 ```
 
----
+
 
 ## 🧠 Model Summary
 
@@ -82,7 +82,7 @@ python app.py
 - Batch Normalization and Dropout for regularization
 - Output: 10-class Softmax (digits 0–9)
 
----
+
 
 ## 📊 Training & Evaluation
 
@@ -92,7 +92,7 @@ python app.py
 - **Epochs:** `Best epochs number using EarlyStopping & ModelCheckpoint`
 - **Final Accuracy:** `~98% on test set`
 
----
+
 
 ## 📦 Requirements
 
@@ -102,7 +102,7 @@ python app.py
 - Matplotlib
 - NumPy
 
----
+
 
 ## 🛠️ Future Improvements
 
@@ -110,7 +110,6 @@ python app.py
 - ✅ Export model to ONNX or TensorFlow Lite
 - ✅ Deploy to Heroku/Render
 
----
 
 
 ## 🌟 Support
