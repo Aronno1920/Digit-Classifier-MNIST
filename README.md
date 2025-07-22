@@ -89,8 +89,8 @@ python app.py
 - **Dataset:** MNIST (from `tensorflow.keras.datasets`)
 - **Loss Function:** `categorical_crossentropy`
 - **Optimizer:** `Adam(learning_rate=0.001)`
-- **Epochs:** Best epochs number using EarlyStopping & ModelCheckpoint
-- **Final Accuracy:** ~98% on test set
+- **Epochs:** `Best epochs number using EarlyStopping & ModelCheckpoint`
+- **Final Accuracy:** `~98% on test set`
 
 ---
 
