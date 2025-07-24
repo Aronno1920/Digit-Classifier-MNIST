@@ -1,14 +1,14 @@
 ######## Import Library
 import io
 import os
+import re
 import numpy as np
 import base64
 
-import tensorflow as tf
-import re
 from PIL import Image
-from flask import Flask, render_template, request, jsonify
+import tensorflow as tf
 from contextlib import redirect_stdout
+from flask import Flask, render_template, request, jsonify
 #################
 from model_builder import train_model
 
