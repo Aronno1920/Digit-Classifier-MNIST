@@ -1,12 +1,7 @@
 
-# 🧠 MNIST Digit Classifier
+# MNIST Digit Classifier
 
-![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange)
-![License](https://img.shields.io/badge/License-MIT-green)
-![Status](https://img.shields.io/badge/status-active-brightgreen)
-
-A deep learning web app that classifies handwritten digits (0–9) using the **MNIST dataset**. Built with **TensorFlow/Keras** and deployed via a lightweight Flask frontend with a live canvas to draw digits.
+A deep learning web app that classifies handwritten digits (0–9) using the **MNIST dataset**. Built with **TensorFlow** or **PyTorch**, deployed via a lightweight Flask frontend with a live canvas to draw digits.
 
 
 
@@ -17,28 +12,6 @@ A deep learning web app that classifies handwritten digits (0–9) using the **M
 - ✍️ Web-based Canvas to Draw Digits  
 - 🔮 Real-Time Prediction using Trained Model  
 - 🧪 98–99% Test Accuracy  
-
-
-
-## 📂 Project Structure
-
-```
-digitclassifier/
-├── static/
-│   ├── script.js
-│   └── style.css
-├── templates/
-│   ├── index.html
-│   └── train.html
-├── model/
-│   └── mnist_model.h5
-├── notebooks/
-│   └── training.ipynb
-├── app.py
-├── model_builder.py
-├── README.md
-└── requirements.txt
-```
 
 
 
