@@ -1,142 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Digit Classifier</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>Handwritten Digit Classifier</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <h1>Handwritten Digit Classifier</h1>
-  <a href="/train">Go to Train Model</a>
+  <header>
+    <h1>🖊️ Handwritten Digit Classifier</h1>
+    <a href="/train" class="train-link">🚀 Train Model</a>
+  </header>
 
-  <div class="container">
-      <h3>Draw a digit (0–9)</h3>
-      <canvas id="canvas" width="280" height="280"></canvas>
+  <main class="container">
+    <h2>✏️ Draw a digit (0–9)</h2>
+    <canvas id="canvas" width="280" height="280"></canvas>
 
-      <div class="buttons">
-          <button onclick="predict()" style="background: #4CAF50;">Predict</button>
-          <button onclick="clearCanvas()" style="background: #606263;">Clear</button>
-      </div>
-      <div id="result"></div>
-      <div id="probs" class="bar-container"></div>
-  </div>
+    <div class="buttons">
+      <button class="predict-btn" onclick="predict()">🔍 Predict</button>
+      <button class="clear-btn" onclick="clearCanvas()">🧹 Clear</button>
+    </div>
 
-<script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
+    <div id="result"></div>
+    <div id="probs" class="bar-container"></div>
+  </main>
 
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  <footer>
+    <p>🛠️ Built with <strong>PyTorch</strong>, <strong>Flask</strong>, and <strong>TorchVision</strong></p>
+  </footer>
 
-    canvas.addEventListener('mousedown', () => drawing = true);
-    canvas.addEventListener('mouseup', () => drawing = false);
-    canvas.addEventListener('mousemove', draw);
-
-    function draw(e) {
-      if (!drawing) return;
-      ctx.fillStyle = "black";
-      ctx.beginPath();
-      ctx.arc(e.offsetX, e.offsetY, 10, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function clearCanvas() {
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      document.getElementById("result").textContent = "";
-    }
-
-    function predict() {
-      const dataURL = canvas.toDataURL('image/png');
-      fetch('/predict', {
-        method: 'POST',
-        body: JSON.stringify({ image: dataURL }),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("result").textContent = "Prediction: " + data.prediction;
-      })
-      .catch(err => console.error(err));
-    }
-  </script>
-
-
-
-<!-- <script src="{{ url_for('static', filename='script.js') }}"></script> -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
-
-
-<!-- <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>MNIST Digit Recognizer</title>
-  <style>
-    canvas {
-      border: 2px solid black;
-      background: white;
-      cursor: crosshair;
-    }
-    #result {
-      font-size: 24px;
-      margin-top: 10px;
-    }
-  </style>
-</head>
-<body>
-
-  <h1>Draw a digit (0–9)</h1>
-  <canvas id="canvas" width="280" height="280"></canvas>
-  <br/>
-  <button onclick="clearCanvas()">Clear</button>
-  <button onclick="predict()">Predict</button>
-  <div id="result"></div>
-
-  <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let drawing = false;
-
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    canvas.addEventListener('mousedown', () => drawing = true);
-    canvas.addEventListener('mouseup', () => drawing = false);
-    canvas.addEventListener('mousemove', draw);
-
-    function draw(e) {
-      if (!drawing) return;
-      ctx.fillStyle = "black";
-      ctx.beginPath();
-      ctx.arc(e.offsetX, e.offsetY, 10, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function clearCanvas() {
-      ctx.fillStyle = "white";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      document.getElementById("result").textContent = "";
-    }
-
-    function predict() {
-      const dataURL = canvas.toDataURL('image/png');
-      fetch('/predict', {
-        method: 'POST',
-        body: JSON.stringify({ image: dataURL }),
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("result").textContent = "Prediction: " + data.prediction;
-      })
-      .catch(err => console.error(err));
-    }
-  </script>
-
-</body>
-</html> -->

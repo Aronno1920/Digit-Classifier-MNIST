@@ -1,86 +1,126 @@
-const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+   const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
 
-    // Setup canvas
-function setupCanvas() {
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 20;
-        ctx.lineCap = "round";
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => drawing = false);
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(e) {
+      if (!drawing) return;
+      ctx.fillStyle = "black";
+      ctx.beginPath();
+      ctx.arc(e.offsetX, e.offsetY, 10, 0, Math.PI * 2);
+      ctx.fill();
     }
 
-setupCanvas();
+    function clearCanvas() {
+      ctx.fillStyle = "white";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      document.getElementById("result").textContent = "";
+    }
 
-let drawing = false;
-
-canvas.addEventListener("mousedown", (e) => {
-        drawing = true;
-        const pos = getMousePos(e);
-        ctx.beginPath();
-        ctx.moveTo(pos.x, pos.y);
-    });
-
-canvas.addEventListener("mousemove", (e) => {
-        if (!drawing) return;
-        const pos = getMousePos(e);
-        ctx.lineTo(pos.x, pos.y);
-        ctx.stroke();
-    });
-
-canvas.addEventListener("mouseup", () => {
-        drawing = false;
-        ctx.closePath();
-    });
-
-canvas.addEventListener("mouseleave", () => {
-        drawing = false;
-        ctx.closePath();
-    });
+    function predict() {
+      const dataURL = canvas.toDataURL('image/png');
+      fetch('/predict', {
+        method: 'POST',
+        body: JSON.stringify({ image: dataURL }),
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("result").textContent = "Prediction: " + data.prediction;
+      })
+      .catch(err => console.error(err));
+    }
 
 
-function getMousePos(evt) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-            x: evt.clientX - rect.left,
-            y: evt.clientY - rect.top
-        };
-}
+// const canvas = document.getElementById("canvas");
+// const ctx = canvas.getContext("2d");
 
-function clearCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        setupCanvas();
-        document.getElementById("result").innerText = "Draw a digit";
-        document.getElementById("probs").innerHTML = "";
-}
+//     // Setup canvas
+// function setupCanvas() {
+//         ctx.fillStyle = "white";
+//         ctx.fillRect(0, 0, canvas.width, canvas.height);
+//         ctx.strokeStyle = "black";
+//         ctx.lineWidth = 20;
+//         ctx.lineCap = "round";
+//     }
 
-function predict() {
-        const image = canvas.toDataURL("image/png");
-        fetch("/predict", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ image: image })
-        })
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("result").innerText = `Prediction: ${data.digit}`;
-            showProbs(data.probs);
-        });
-}
+// setupCanvas();
 
-function showProbs(probs) {
-        const container = document.getElementById("probs");
-        container.innerHTML = "";
-        probs.forEach((p, i) => {
-            const label = document.createElement("div");
-            label.className = "bar-label";
-            label.innerHTML = `<span>${i}</span><span>${(p * 100).toFixed(2)}%</span>`;
+// let drawing = false;
 
-            const bar = document.createElement("div");
-            bar.className = "bar";
-            bar.style.width = `${(p * 100).toFixed(2)}%`;
+// canvas.addEventListener("mousedown", (e) => {
+//         drawing = true;
+//         const pos = getMousePos(e);
+//         ctx.beginPath();
+//         ctx.moveTo(pos.x, pos.y);
+//     });
 
-            container.appendChild(label);
-            container.appendChild(bar);
-        });
-}
+// canvas.addEventListener("mousemove", (e) => {
+//         if (!drawing) return;
+//         const pos = getMousePos(e);
+//         ctx.lineTo(pos.x, pos.y);
+//         ctx.stroke();
+//     });
+
+// canvas.addEventListener("mouseup", () => {
+//         drawing = false;
+//         ctx.closePath();
+//     });
+
+// canvas.addEventListener("mouseleave", () => {
+//         drawing = false;
+//         ctx.closePath();
+//     });
+
+
+// function getMousePos(evt) {
+//         const rect = canvas.getBoundingClientRect();
+//         return {
+//             x: evt.clientX - rect.left,
+//             y: evt.clientY - rect.top
+//         };
+// }
+
+// function clearCanvas() {
+//         ctx.clearRect(0, 0, canvas.width, canvas.height);
+//         setupCanvas();
+//         document.getElementById("result").innerText = "Draw a digit";
+//         document.getElementById("probs").innerHTML = "";
+// }
+
+// function predict() {
+//         const image = canvas.toDataURL("image/png");
+//         fetch("/predict", {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({ image: image })
+//         })
+//         .then(res => res.json())
+//         .then(data => {
+//             document.getElementById("result").innerText = `Prediction: ${data.digit}`;
+//             showProbs(data.probs);
+//         });
+// }
+
+// function showProbs(probs) {
+//         const container = document.getElementById("probs");
+//         container.innerHTML = "";
+//         probs.forEach((p, i) => {
+//             const label = document.createElement("div");
+//             label.className = "bar-label";
+//             label.innerHTML = `<span>${i}</span><span>${(p * 100).toFixed(2)}%</span>`;
+
+//             const bar = document.createElement("div");
+//             bar.className = "bar";
+//             bar.style.width = `${(p * 100).toFixed(2)}%`;
+
+//             container.appendChild(label);
+//             container.appendChild(bar);
+//         });
+// }

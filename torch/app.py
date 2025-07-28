@@ -1,141 +1,123 @@
-######## Import Library
-import re
-import io
+######## Import Libraries
 import os
+import io
+import re
 import base64
 import numpy as np
-
-import torch
-from model_builder import MNISTModel
 from PIL import Image, ImageOps
 from flask import Flask, request, jsonify, render_template
+from contextlib import redirect_stdout
 
+import torch
 from torchvision import transforms
-from torchvision.transforms import ToPILImage, ToTensor, Normalize, Compose
-#################
-from model_builder import train_model
+from model_builder import train_model, MNISTModel
+
+######## Custom Model_Config
+from model_config import ModelConfig
 
 
-######## Start Application
+
+######## Start Flask Application
 app = Flask(__name__)
-#################
 
+######## Load the Trained Model
+model_config = ModelConfig()
+model_path = model_config.get_model_path()
 
-######## Load the trained model
 model = MNISTModel()
-model.load_state_dict(torch.load('model/mnist_model.pt', map_location='cpu'))
-model.eval()
-#################
 
+if os.path.exists(model_path):
+    model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+    model.eval()
+    print("PyTorch model loaded successfully.")
+else:
+    print("Model file not found. Please train the model first.")
 
-######## Load Root - Index page
+######## Route: Index Page
 @app.route('/')
 def index():
     return render_template('index.html')
-#################
 
-
-######## Call Predict Function
+######## Route: Predict from Base64 Image
 @app.route('/predict', methods=['POST'])
 def predict():
-
     data = request.get_json()
-    img_data = data['image']
-    img_str = re.search(r'base64,(.*)', img_data).group(1)
-    image_bytes = base64.b64decode(img_str)
+    img_data = data.get('image')
 
-    image = Image.open(io.BytesIO(image_bytes)).convert('L')     # Step 1: Load and convert to grayscale
-    image = ImageOps.invert(image)     # Step 2: Invert the image (black bg, white digit like MNIST)
+    if not img_data:
+        return jsonify({'error': 'No image data provided'}), 400
 
-    np_img = np.array(image)     # Step 3: Crop the content area to remove whitespace
-    coords = np.argwhere(np_img < 255)  # non-white pixels
-    if coords.size == 0:
-        return jsonify({'prediction': 'blank'})
+    try:
+        # Decode base64 image
+        img_str = re.search(r'base64,(.*)', img_data).group(1)
+        image_bytes = base64.b64decode(img_str)
+        image = Image.open(io.BytesIO(image_bytes)).convert('L')
 
-    y0, x0 = coords.min(axis=0)
-    y1, x1 = coords.max(axis=0) + 1
-    image = image.crop((x0, y0, x1, y1))  # (left, upper, right, lower)
+        # Invert: black background, white digit (like MNIST)
+        image = ImageOps.invert(image)
 
-    image = image.resize((20, 20), Image.Resampling.LANCZOS)     # Step 4: Resize to 20x20 (like MNIST) and paste into 28x28 center
-    new_image = Image.new('L', (28, 28), 0)  # black background
-    new_image.paste(image, ((28 - 20) // 2, (28 - 20) // 2))
+        # Crop the digit (remove whitespace)
+        np_img = np.array(image)
+        coords = np.argwhere(np_img < 255)
+        if coords.size == 0:
+            return jsonify({'prediction': 'blank'})
+        
+        y0, x0 = coords.min(axis=0)
+        y1, x1 = coords.max(axis=0) + 1
+        image = image.crop((x0, y0, x1, y1))
 
+        # Resize to 20x20 and center in 28x28
+        image = image.resize((20, 20), Image.Resampling.LANCZOS)
+        new_image = Image.new('L', (28, 28), 0)
+        new_image.paste(image, ((28 - 20) // 2, (28 - 20) // 2))
 
-    new_image.save("debug_final_input.png")  # Optional: Save debug image to verify it's centered
+        # Optional: Save for debugging
+        new_image.save("debug_final_input.png")
 
-    # Step 5: Convert to tensor and normalize
-    transform = transforms.Compose([
-      transforms.ToTensor(),
-      transforms.Normalize((0.1307,), (0.3081,))
-    ])
-    input_tensor = transform(new_image).unsqueeze(0)  # shape [1,1,28,28]
-    input_tensor = input_tensor.view(-1, 28 * 28)     # shape [1, 784]
+        # Normalize and convert to tensor
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.1307,), (0.3081,))
+        ])
+        input_tensor = transform(new_image).unsqueeze(0)  # Shape: [1, 1, 28, 28]
 
+        # Predict
+        with torch.no_grad():
+            output = model(input_tensor)
+            prediction = output.argmax(dim=1).item()
 
-    with torch.no_grad():     # Predict
-     output = model(input_tensor)
-     prediction = output.argmax(dim=1).item()
-     
+        return jsonify({'prediction': prediction})
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-    return jsonify({'prediction': prediction})
-
-#################
-
-
-######## Call Model Training Function
+######## Route: Train the Model
 @app.route("/train", methods=["GET", "POST"])
 def train():
     logs = ""
-    # if request.method == "POST":
-    #     buffer = io.StringIO()
-    #     with redirect_stdout(buffer):
-    #         history = train_model()
-
-    #         print("Training completed!")
-    #         print("Final accuracy:", history['accuracy'][-1])
-
-    #     logs = buffer.getvalue()
-
+    if request.method == "POST":
+        buffer = io.StringIO()
+        with redirect_stdout(buffer):
+            history = train_model()
+            
+            print("Training completed!")
+            print(f"Final Accuracy: {history['accuracy'][-1]:.4f}")
+        logs = buffer.getvalue()
     return render_template("train.html", logs=logs)
-#################
 
-
-
-######## Image preprocessing transform
-transform = transforms.Compose([
-    transforms.Grayscale(),
-    transforms.Resize((28, 28)),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5,), (0.5,))
-])
-
-
+######## Image Preprocessing Helper (if needed elsewhere)
 def preprocess_canvas_image(img):    
-
-    # Convert to grayscale if needed
     if img.mode != 'L':
         img = img.convert('L')
-
-    # Invert colors: MNIST digits are white (255) on black (0)
     img = ImageOps.invert(img)
-
-    # Resize to 28x28 if needed
     img = img.resize((28, 28))
 
-    # Convert to numpy array and scale pixels 0-1
+    # Normalize to [0, 1] and flatten
     img_arr = np.array(img) / 255.0
-
-    # Flatten to 784 vector
     img_arr = img_arr.reshape(1, 784).astype(np.float32)
-
-    # Convert to tensor
     tensor = torch.from_numpy(img_arr)
-
     return tensor
 
-
-
-
-
+######## Run Flask App
 if __name__ == '__main__':
     app.run(debug=True)
