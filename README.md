@@ -76,25 +76,6 @@ python app.py
 - **Final Accuracy:** `~98% on test set`
 
 
-
-## 📦 Requirements
-
-- Python 3.8+ (<= 3.11.9)
-- TensorFlow 2.x
-- Flask
-- Matplotlib
-- NumPy
-
-
-
-## 🛠️ Future Improvements
-
-- ✅ Add Convolutional Neural Network (CNN)
-- ✅ Export model to ONNX or TensorFlow Lite
-- ✅ Deploy to Heroku/Render
-
-
-
 ## 🌟 Support
 
 If you find this project helpful, please consider ⭐ starring the repo and sharing it!
