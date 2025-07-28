@@ -22,13 +22,20 @@ A deep learning web app that classifies handwritten digits (0–9) using the **M
 ```bash
 git clone https://github.com/aronno1920/mnist-digit-classifier.git
 cd mnist-digit-classifier
---- if you want to use python v>=3.13, go to tensorflow
-cd tensorflow or cd torch
 
-or 
 --- if you want to use python v<=3.12, go to torch
+
+```
+if you want to use python v>=3.13, go to tensorflow
+```bash
+cd tensorflow
+```
+
+if you want to use python v>=3.13, go to tensorflow
+```bash
 cd torch
 ```
+
 
 2. **Create a virtual environment:**
 ```bash
