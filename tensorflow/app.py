@@ -11,15 +11,17 @@ from contextlib import redirect_stdout
 from flask import Flask, render_template, request, jsonify
 #################
 from model_builder import train_model
-
+from model_config import ModelConfig
 
 ######## Start Application
 app = Flask(__name__)
-
-if os.path.exists("model/mnist_model.keras"):
-    model =  tf.keras.models.load_model("model/mnist_model.keras")
 #################
 
+
+######## Load the Trained Model
+model_config = ModelConfig()
+model_path = model_config.get_model_path()
+#################
 
 
 ######## Load Root - Index page
@@ -44,8 +46,8 @@ def predict():
     image_array = np.expand_dims(image_array, axis=0)   # shape: (1, 28, 28)
     image_array = image_array.reshape(1, 784)  
 
-    if os.path.exists("model/mnist_model.keras"):
-        model =  tf.keras.models.load_model("model/mnist_model.keras")
+    if model_config.model_exists:
+        model =  tf.keras.models.load_model(model_path)
 
         prediction = model.predict(image_array)
         probs = prediction[0].tolist()

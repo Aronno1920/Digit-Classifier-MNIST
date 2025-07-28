@@ -10,10 +10,16 @@ from tensorflow.keras.optimizers import Adam
 # Best epochs number using EarlyStopping & ModelCheckpoint
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 #################
+from model_config import ModelConfig
 
 
 ################## Declare method
 def train_model():
+
+    ######## Load the Trained Model
+    model_config = ModelConfig()
+    model_path = model_config.get_model_path()
+    #################
 
     ###### Load dataset
     data = mnist.load_data()
@@ -71,7 +77,7 @@ def train_model():
     )
 
     model_checkpoint = ModelCheckpoint(
-        filepath='model/mnist_model.keras',
+        filepath=model_path,
         monitor='val_loss',
         save_best_only=True,
         verbose=1
