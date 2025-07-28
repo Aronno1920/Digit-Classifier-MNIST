@@ -38,7 +38,7 @@ digitclassifier/
 
 1. Clone the repository:
 
-git clone https://github.com/sujonnath/Digit-Classifier-MNIST.git
+git clone https://github.com/aronno1920/Digit-Classifier-MNIST.git
 cd mnist-digit-classifier
 
 2. Create and activate a virtual environment (optional but recommended)
@@ -72,11 +72,11 @@ python app.py
 
 
     Python 3.8+ (>= 3.11.9)
-    TensorFlow 2.x/torch
     Flask
     Matplotlib
     NumPy
-
+    torch
+    torchvision
 
 
 
